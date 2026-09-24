@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+.turbo
+*.local
+.env
+.env.*
+!.env.example
+supabase/.branches
+supabase/.temp

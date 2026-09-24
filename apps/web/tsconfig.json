@@ -1,0 +1,18 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@neon/domain": ["../../packages/domain/src/index.ts"],
+      "@neon/contracts": ["../../packages/contracts/src/index.ts"],
+      "@neon/db": ["../../packages/db/src/index.ts"],
+      "@neon/ui": ["../../packages/ui/src/index.tsx"],
+      "@neon/observability": ["../../packages/observability/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

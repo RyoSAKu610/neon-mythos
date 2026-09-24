@@ -1,0 +1,25 @@
+{
+  "name": "neon-mythos",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > packages/db/src/database.types.ts",
+    "demo:economy": "pnpm --filter @neon/domain exec tsx src/demo.ts"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

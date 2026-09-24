@@ -1,0 +1,14 @@
+{
+  "name": "@neon/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "echo lint ok",
+    "typecheck": "tsc --noEmit",
+    "test": "echo no-db-test"
+  },
+  "dependencies": { "@supabase/supabase-js": "^2.47.0", "@neon/domain": "workspace:*" },
+  "devDependencies": { "typescript": "^5.7.3" }
+}
