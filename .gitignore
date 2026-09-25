@@ -12,3 +12,5 @@ supabase/.temp
 # playwright
 apps/web/test-results/
 test-results/
+.vercel
+.env*

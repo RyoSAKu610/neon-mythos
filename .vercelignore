@@ -1,0 +1,9 @@
+node_modules
+.next
+.turbo
+test-results
+apps/web/test-results
+coverage
+*.log
+.env*.local
+.vercel
