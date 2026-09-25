@@ -10,9 +10,12 @@
       "@neon/contracts": ["../../packages/contracts/src/index.ts"],
       "@neon/db": ["../../packages/db/src/index.ts"],
       "@neon/ui": ["../../packages/ui/src/index.tsx"],
-      "@neon/observability": ["../../packages/observability/src/index.ts"]
+      "@neon/observability": ["../../packages/observability/src/index.ts"],
+      "@neon/agents": ["../../packages/agents/src/index.ts"],
+      "@neon/tools": ["../../packages/tools/src/index.ts"],
+      "@neon/ai-core": ["../../packages/ai-core/src/index.ts"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "middleware.ts"],
   "exclude": ["node_modules"]
 }

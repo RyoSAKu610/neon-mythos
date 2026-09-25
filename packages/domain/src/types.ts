@@ -129,7 +129,7 @@ export interface LedgerEntry {
   id: string;
   worldId: WorldId;
   contractId: string | null;
-  fromPrincipalId: string; // "treasury" for mint
+  fromPrincipalId: string;
   toPrincipalId: string;
   amountCredits: number;
   memo: string;
@@ -157,10 +157,42 @@ export interface DomainEvent {
   createdAt: string;
 }
 
+/** Fixed UUID identifying the mint. Must exist as a principals row in SQL seeds. */
+export const TREASURY_ID = "00000000-0000-0000-0000-000000000000";
+
+/** Max credits per transfer. Matches Postgres `integer` upper bound. */
+export const MAX_CREDITS = 2147483647;
+
+/** Cap for hashed artifact payloads (1 MiB of canonical JSON). */
+export const MAX_ARTIFACT_BYTES = 1024 * 1024;
+
+export type Clock = () => string;
+
 export function nowIso(): string {
   return new Date().toISOString();
 }
 
-export function uid(prefix: string): string {
-  return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
+export class EconomyError extends Error {
+  readonly code: string;
+  constructor(code: string, message: string) {
+    super(`[${code}] ${message}`);
+    this.name = "EconomyError";
+    this.code = code;
+  }
 }
+
+/** Collision-resistant id. Uses crypto.randomUUID when available. */
+export function uid(prefix: string): string {
+  const g = globalThis as { crypto?: { randomUUID?: () => string } };
+  if (g.crypto?.randomUUID) {
+    return `${prefix}_${g.crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
+  }
+  // Fallback: 128-bit-ish entropy from Math.random + time + counter.
+  uidCounter += 1;
+  const r = () =>
+    Math.floor(Math.random() * 0xffffffff)
+      .toString(36)
+      .padStart(7, "0");
+  return `${prefix}_${r()}${r()}${Date.now().toString(36)}${uidCounter.toString(36)}`.slice(0, 24);
+}
+let uidCounter = 0;

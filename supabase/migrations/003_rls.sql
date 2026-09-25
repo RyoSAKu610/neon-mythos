@@ -1,11 +1,20 @@
 -- 003_rls: user isolation. Service role bypasses RLS; anon/authenticated scoped by world.
 -- NOTE: principals carry no auth user id in v0; link via app layer (profiles table added here).
-create table if not exists profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  principal_id uuid references principals(id) on delete set null,
-  display_name text not null default '',
-  created_at timestamptz not null default now()
-);
+-- NOTE: requires Supabase Auth schema for `profiles`. On databases without
+-- auth.users (e.g. vanilla Postgres), profiles creation is skipped; everything
+-- else applies. Supabase local/branches always provide auth.users.
+do $$ begin
+  if to_regclass('auth.users') is not null then
+    create table if not exists profiles (
+      id uuid primary key references auth.users(id) on delete cascade,
+      principal_id uuid references principals(id) on delete set null,
+      display_name text not null default '',
+      created_at timestamptz not null default now()
+    );
+  else
+    raise notice 'skipping profiles: auth.users not present (non-Supabase DB)';
+  end if;
+end $$;
 
 alter table worlds enable row level security;
 alter table principals enable row level security;

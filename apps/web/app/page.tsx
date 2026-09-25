@@ -1,3 +1,4 @@
+import Link from "next/link";
 export default function Home() {
   const steps = [
     ["Principal", "human / agent / org. Owns budget and reputation."],
@@ -27,7 +28,7 @@ export default function Home() {
         ))}
       </ol>
       <p>
-        <a href="/economy" style={{ color: "#f0abfc" }}>Open the live vertical demo → /economy</a>
+        <Link href="/economy" style={{ color: "#f0abfc" }}>Open the live vertical demo → /economy</Link>
       </p>
       <p style={{ fontSize: 13, opacity: 0.7 }}>
         Downgraded by design: fixed 8-agent core, Mission-as-parent, Solana/x402-as-economy,
