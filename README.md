@@ -1,5 +1,9 @@
 # Neon Mythos — collective-intelligence OS with an economic core
 
+[![Vercel](https://vercel.com/button)](https://neon-mythos-p0yxp3dao-ryosaku610s-projects.vercel.app)
+
+Production: https://neon-mythos-p0yxp3dao-ryosaku610s-projects.vercel.app
+
 Vertical flow first: Principal → Capability → Service → Request → Contract →
 Task → Artifact → Verification → Ledger → Reputation (+ World, Event Ledger).
 
