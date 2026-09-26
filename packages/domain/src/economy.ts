@@ -12,6 +12,7 @@ import {
   Principal,
   Reputation,
   Request,
+  RequestKind,
   Service,
   Task,
   TREASURY_ID,
@@ -377,6 +378,7 @@ export function runHireFlow(
     serviceTitle: string;
     priceCredits: number;
     budgetCredits?: number;
+    kind?: RequestKind;
     requestTitle: string;
     taskTitle: string;
     artifactContent: unknown;
@@ -422,6 +424,10 @@ export function runHireFlow(
   if (!["pass", "partial", "fail"].includes(args.verdict)) {
     throw new EconomyError("invalid-verdict", `unknown verdict ${args.verdict}`);
   }
+  const kind: RequestKind = args.kind ?? "service_hire";
+  if (!["service_hire", "mission_investigation", "custom"].includes(kind)) {
+    throw new EconomyError("invalid-kind", `unknown request kind ${args.kind}`);
+  }
   const rubric = args.rubricScores ?? defaultRubric(args.verdict);
   for (const [k, v] of Object.entries(rubric)) {
     if (typeof v !== "number" || v < 0 || v > 5) {
@@ -464,7 +470,7 @@ export function runHireFlow(
   const request: Request = {
     id: uniqueId(state, "req"),
     requesterId: args.requester.id,
-    kind: "service_hire",
+    kind,
     capabilityId: args.capabilityId,
     title: args.requestTitle,
     details: args.requestTitle,

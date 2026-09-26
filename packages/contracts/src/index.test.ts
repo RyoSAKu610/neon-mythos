@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   artifactSchema,
+  decodeIntent,
   demoHireSchema,
+  encodeIntent,
+  MAX_INTENT_CHARS,
   principalSchema,
   serviceSchema,
   verificationSchema,
@@ -82,5 +85,21 @@ describe("demoHireSchema", () => {
     }
     expect(demoHireSchema.safeParse({ priceCredits: 0 }).success).toBe(false);
     expect(demoHireSchema.safeParse({ verdict: "maybe" }).success).toBe(false);
+  });
+});
+
+describe("intent codec", () => {
+  it("round-trips incl. multibyte text", () => {
+    const p = { v: 1 as const, t: "AI市場を調査せよ", b: " Proofs あいう ", k: "mission_investigation" as const, p: 120 };
+    const enc = encodeIntent(p);
+    expect(enc.length).toBeLessThanOrEqual(MAX_INTENT_CHARS);
+    expect(decodeIntent(enc)).toEqual({ ...p });
+  });
+  it("rejects oversized briefs and garbage", () => {
+    expect(() =>
+      encodeIntent({ v: 1, t: "t", b: "あ".repeat(600), k: "service_hire", p: 10 }),
+    ).toThrow(/too large/);
+    expect(() => decodeIntent("!!!not-base64!!!")).toThrow();
+    expect(() => decodeIntent("e30=")).toThrow(); // {} fails schema
   });
 });

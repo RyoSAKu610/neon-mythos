@@ -252,8 +252,7 @@ describe("vertical hire flow", () => {
   });
 });
 
-describe("hashing", () => {
-  it("is key-order stable and sha256", () => {
+describe("hashing", () => {  it("is key-order stable and sha256", () => {
     expect(stableStringify({ b: 2, a: 1 })).toBe(stableStringify({ a: 1, b: 2 }));
     expect(hashContent({ a: 1 })).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(hashContent({ a: 1 })).toBe(hashContent({ a: 1 }));
@@ -267,5 +266,20 @@ describe("hashing", () => {
   it("uid has 128-bit entropy shape", () => {
     const ids = new Set(Array.from({ length: 5000 }, () => uid("t")));
     expect(ids.size).toBe(5000);
+  });
+});
+
+describe("request kind", () => {
+  it("defaults to service_hire and accepts mission_investigation", () => {
+    const a = fundedHire("production");
+    const reqA = a.s.requests.find((x) => x.id === a.r.contract.requestId)!;
+    expect(reqA.kind).toBe("service_hire");
+    const b = fundedHire("production", { kind: "mission_investigation" });
+    const reqB = b.s.requests.find((x) => x.id === b.r.contract.requestId)!;
+    expect(reqB.kind).toBe("mission_investigation");
+    expect(b.r.contract.status).toBe("settled");
+  });
+  it("rejects unknown kinds", () => {
+    expect(() => fundedHire("production", { kind: "heist" })).toThrow(/invalid-kind/);
   });
 });

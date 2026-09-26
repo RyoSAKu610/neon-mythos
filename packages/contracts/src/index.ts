@@ -85,6 +85,60 @@ export const demoHireSchema = z.object({
   verdict: z.enum(["pass", "partial", "fail"]).default("pass"),
 });
 
+// QR intent payload (v1, self-contained): scanned at /s?m=<payload>.
+// Short keys keep the QR small; encoded length is capped for scan reliability.
+export const intentPayloadSchema = z.object({
+  v: z.literal(1),
+  t: z.string().min(1).max(120), // title
+  b: z.string().min(1).max(600), // brief (idea text)
+  k: z.enum(["service_hire", "mission_investigation", "custom"]).default("service_hire"),
+  p: z.number().int().min(1).max(MAX_CREDITS).default(100), // price
+});
+
+export type IntentPayload = z.infer<typeof intentPayloadSchema>;
+
+/** Max base64url chars accepted in ?m= (≈1.3KB → reliable QR scan). */
+export const MAX_INTENT_CHARS = 1800;
+
+function b64urlEncode(s: string): string {
+  const b64 =
+    typeof Buffer !== "undefined"
+      ? Buffer.from(s, "utf8").toString("base64")
+      : btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64urlDecode(s: string): string {
+  const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
+  if (typeof Buffer !== "undefined") return Buffer.from(b64, "base64").toString("utf8");
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+export function encodeIntent(payload: IntentPayload): string {
+  const parsed = intentPayloadSchema.parse(payload);
+  const out = b64urlEncode(JSON.stringify(parsed));
+  if (out.length > MAX_INTENT_CHARS) {
+    throw new Error(`intent too large for QR (${out.length} > ${MAX_INTENT_CHARS} chars)`);
+  }
+  return out;
+}
+
+export function decodeIntent(raw: string): IntentPayload {
+  if (typeof raw !== "string" || raw.length < 1 || raw.length > MAX_INTENT_CHARS) {
+    throw new Error("invalid intent payload");
+  }
+  let json: unknown;
+  try {
+    json = JSON.parse(b64urlDecode(raw));
+  } catch {
+    throw new Error("invalid intent payload");
+  }
+  return intentPayloadSchema.parse(json);
+}
+
 export type PrincipalInput = z.infer<typeof principalSchema>;
 export type ServiceInput = z.infer<typeof serviceSchema>;
 export type RequestInput = z.infer<typeof requestSchema>;
